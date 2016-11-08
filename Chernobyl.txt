@@ -1,0 +1,66 @@
+def f(Q):
+    A=copy(Q)
+    for x in [1..A.nrows()-2]:
+        for y in [1..A.ncols()-2]:
+            if Q[x,y]>0.1:
+                Lrand=[randint(1,6) for z in [0..Q[x,y]*10 -2]] #randint(2,6) para que siga más tiempo
+                for z in [0..len(Lrand)-1]:
+                   
+                    if Lrand[z]==2 and Q[x-1,y]!=0: 
+                        A[x-1,y]+= 0.1
+
+                    if Lrand[z]==3 and Q[x,y+1]!=0: 
+                        A[x,y+1]+= 0.1
+
+                    if Lrand[z]==4 and Q[x+1,y]!=0: 
+                        A[x+1,y]+= 0.1
+                    
+                    if Lrand[z]==5 and Q[x,y-1]!=0: 
+                        A[x,y-1]+= 0.1
+                    
+                sum=0
+                for w in [0..len(Lrand)-1]:
+                    if Lrand[w]==6: sum+=1
+                if sum ==0: A[x,y]=0
+                if sum >=1: A[x,y]=0.2+0.1*(sum-1)
+            
+                if Q[x,y] ==0: A[x,y]=0
+                if A[x,y]<0: A[x,y]=0
+    return A
+
+#__
+
+from matplotlib import cm 
+import matplotlib.pyplot as plt 
+from matplotlib.colors import LinearSegmentedColormap
+
+cdict1 = {'red':   ((0.0, 0.0, 0.0),
+                    (0.1, 1.0, 1.1),
+                   (0.2, 1.0, 0.0),
+                    (1.0, 1.0, 1.0)),
+
+         'green': ((0.0, 0.0, 0.0),
+                   (0.1, 1.0, 1.0),
+                   (0.2, 0.0, 0.0),
+                   (1.0, 0.0, 0.0)),
+
+         'blue':  ((0.0, 0.0, 0.0),
+                   (0.1, 1.0, 1.0),
+                   (0.2, 0.0, 0.0),
+                   (1.0, 0.0, 0.0))
+         }
+
+blue_red1 = LinearSegmentedColormap('BlueRed1', cdict1)
+
+#__
+
+M=matrix(QQ,15,[0.1 for x in xsrange(225)])
+#Si le pones 2.0 en vez de 0.2, se va diluyendo M[7,7]=2 % aquí cmap='Oranges'
+M[7,7]=.2
+Anim=[]
+for x in [0..10]:
+    W=copy(f(M))
+    Anim.append(matrix_plot(M,norm='value', gridlines=[[0.5 + x for x in xsrange(15)],[0.5 + x for x in xsrange(15)]], gridlinesstyle=dict(color="black", linestyle="-"), cmap= blue_red1))#'RdYlBu'))cmap='Oranges')) 
+    M=copy(W)
+a=animate(Anim)
+a.show(delay=50)                   
